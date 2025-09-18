@@ -8,6 +8,7 @@ public class GridManager : MonoBehaviour
     // Maybe need to make this Game Manager and decouple GridManager functionality into its own system
     [Header("Managers")]
     public TurnManager turnManager;
+    public UIManager uiManager;
     [Header("Grid Settings")]
     public int gridWidth = 8;
     public int gridHeight = 8;
@@ -114,74 +115,100 @@ public class GridManager : MonoBehaviour
         CenterCamera();
     }
 
-void CenterCamera()
-{
-    Camera.main.transform.position = new Vector3(20, 35, 5);
-    Camera.main.transform.rotation = Quaternion.Euler(75, 0, 0);
-}
+    void CenterCamera()
+    {
+        Camera.main.transform.position = new Vector3(10, 50, 5);
+        Camera.main.transform.rotation = Quaternion.Euler(75, 0, 0);
+    }
 
     public void OnSquareClicked(int x, int z)
     {
         GridSquare square = gameBoard[x, z];
-        if (square.playerOwnership == PlayerN.None)
+        PlayerN owner = square.playerOwnership;
+        Player currentPlayer = turnManager.currentPlayer;
+        // Basic capture logic
+        if (owner == PlayerN.None && turnManager.selectedAction == TurnManager.PlayerAction.Capture)
         {
             square.playerOwnership = turnManager.currentPlayer.identity;
             square.manaState = ManaState.Kindling;
-            UpdateSquareVisual(x, z);
         }
-        else
+        else if (owner == currentPlayer.identity && square.manaState == ManaState.Ignited)
         {
-            switch (square.manaState)
+            square.manaState = ManaState.Ashed;
+            currentPlayer.manaValues[(int)square.elementType]++;
+            turnManager.UpdateManaText();
+        }
+        else if (turnManager.selectedAction == TurnManager.PlayerAction.AdminDebug)
+        {
+            AdminDebugMana(square);
+        }
+        else if (turnManager.selectedAction == TurnManager.PlayerAction.Transmute && turnManager.transmuteSelected && turnManager.transmuteElement != square.elementType)
+        {
+            ElementType selectedElement = turnManager.transmuteElement;
+            if (currentPlayer.manaValues[selectedElement] > 0)
+            {
+                currentPlayer.manaValues[selectedElement]--;
+                square.elementType = selectedElement;
+                turnManager.UpdateManaText();
+            }
+        }
+        UpdateSquareVisual(x, z);
+
+    }
+
+    public void AdminDebugMana(GridSquare square) // Debug feature to cycle mana state manually
+    {
+        switch (square.manaState)
             {
                 case ManaState.Kindling:
                     square.manaState = ManaState.Ignited;
                     break;
                 case ManaState.Ignited:
                     square.manaState = ManaState.Ashed;
-                    switch (square.elementType)
-                    {
-                        case ElementType.Fire:
-                            turnManager.currentPlayer.manaValues.fire++;
-                            break;
-                        case ElementType.Water:
-                            turnManager.currentPlayer.manaValues.water++;
-                            break;
-                        case ElementType.Earth:
-                            turnManager.currentPlayer.manaValues.earth++;
-                            break;
-                        case ElementType.Air:
-                            turnManager.currentPlayer.manaValues.air++;
-                            break;
-                    }
+                    // switch (square.elementType)
+                    // {
+                    //     case ElementType.Fire:
+                    //         turnManager.currentPlayer.manaValues.fire++;
+                    //         break;
+                    //     case ElementType.Water:
+                    //         turnManager.currentPlayer.manaValues.water++;
+                    //         break;
+                    //     case ElementType.Earth:
+                    //         turnManager.currentPlayer.manaValues.earth++;
+                    //         break;
+                    //     case ElementType.Air:
+                    //         turnManager.currentPlayer.manaValues.air++;
+                    //         break;
+                    // }
                     turnManager.UpdateManaText();
                     break;
                 case ManaState.Ashed:
                     square.manaState = ManaState.Kindling;
                     break;
             }
-            UpdateSquareVisual(x, z);
-        }
     }
 
-    public void OnSquareRightClicked(int x, int z)
+    public void OnSquareRightClicked(int x, int z) // Admin Debug for Player Ownership
     {
         GridSquare square = gameBoard[x, z];
-        if (square.playerOwnership != PlayerN.None)
-        {
-            // Uncapture the square
-            square.playerOwnership = PlayerN.None;
-            square.manaState = ManaState.Uncaptured; // Reset to uncaptured state
-            
-            // Remove the ownership border
-            GameObject borderObj = GameObject.Find($"OwnershipBorder_{x}_{z}");
-            if (borderObj != null)
+        if (turnManager.selectedAction == TurnManager.PlayerAction.AdminDebug && square.playerOwnership != PlayerN.None)
             {
-                DestroyImmediate(borderObj);
+                // Uncapture the square
+                square.playerOwnership = PlayerN.None;
+                square.manaState = ManaState.Uncaptured; // Reset to uncaptured state
+
+                // Remove the ownership border
+                GameObject borderObj = GameObject.Find($"OwnershipBorder_{x}_{z}");
+                if (borderObj != null)
+                {
+                    DestroyImmediate(borderObj);
+                }
+
+                UpdateSquareVisual(x, z);
             }
-            
-            UpdateSquareVisual(x, z);
-        }
     }
+
+
 
     void UpdateSquareVisual(int x, int z)
     {

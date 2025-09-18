@@ -10,6 +10,37 @@ public class ManaValues
     public int earth = 0;
     public int water = 0;
     public int air = 0;
+
+    public int this[int index]
+    {
+        get
+        {
+            return index switch
+            {
+                0 => fire,
+                1 => water, 
+                2 => air,
+                3 => earth,
+                _ => 0
+            };
+        }
+        set
+        {
+            switch (index)
+            {
+                case 0: fire = value; break;
+                case 1: water = value; break;
+                case 2: air = value; break;
+                case 3: earth = value; break;
+            }
+        }
+    }
+    
+    public int this[ElementType element]
+    {
+        get => this[(int)element];
+        set => this[(int)element] = value;
+    }
 }
 
 public class Player
