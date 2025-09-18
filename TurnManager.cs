@@ -30,9 +30,7 @@ public class TurnManager : MonoBehaviour
         currentPlayer = currentPlayer.identity == PlayerN.Player1 ? player2 : player1;
         if (currentPlayerText != null)
             currentPlayerText.text = $"Active Player: {currentPlayer.identity}";
-
-        if (gridManager != null)
-            gridManager.GridMana();
+        StartTurn();
     }
 
     public void StartTurn()
