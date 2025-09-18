@@ -268,7 +268,7 @@ void CenterCamera()
 
     public void UpdateMana(GridSquare square)
     {
-        if (turnManager.currentPlayer == square.playerOwnership)
+        if (turnManager.currentPlayer.identity == square.playerOwnership)
         {
             if (square.manaState == ManaState.Ashed)
                 {

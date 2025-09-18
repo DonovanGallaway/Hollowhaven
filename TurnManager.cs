@@ -18,21 +18,24 @@ public class TurnManager : MonoBehaviour
     public TextMeshProUGUI currentPlayerText;
     public TextMeshProUGUI manaCountText;
 
-    public void SwitchPlayer()
+    public enum TurnState { Ignite, SelectAction, TargetingSquare, TargetingMultiple, ConfirmingAction, ExecutingAction };
+    public enum PlayerAction { Capture, Transmute, Attack, Ward, Extinguish, EditQualia, CastSpell };
+    public TurnState currentState = TurnState.SelectAction;
+    public PlayerAction? selectedAction = null;
+    public void SwitchPlayer() // Ends turn
     {
-        // Switch to the other player
+        currentPlayer.manaValues = new ManaValues();
         currentPlayer = currentPlayer.identity == PlayerN.Player1 ? player2 : player1;
-        
-        // Update UI with null checks
+
         if (currentPlayerText != null)
             currentPlayerText.text = $"Active Player: {currentPlayer.identity}";
-        
+
         UpdateManaText();
 
         if (gridManager != null)
             gridManager.GridMana();
     }
-
+    
     public void UpdateManaText()
     {
         if (currentPlayer != null && currentPlayer.manaValues != null && manaCountText != null)
