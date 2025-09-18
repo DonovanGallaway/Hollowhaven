@@ -22,20 +22,27 @@ public class TurnManager : MonoBehaviour
     public enum PlayerAction { Capture, Transmute, Attack, Ward, Extinguish, EditQualia, CastSpell };
     public TurnState currentState = TurnState.SelectAction;
     public PlayerAction? selectedAction = null;
-    public void SwitchPlayer() // Ends turn
+    public void EndTurn() // Ends turn
     {
+        // Mana cleanup
         currentPlayer.manaValues = new ManaValues();
+        // change player identity
         currentPlayer = currentPlayer.identity == PlayerN.Player1 ? player2 : player1;
-
         if (currentPlayerText != null)
             currentPlayerText.text = $"Active Player: {currentPlayer.identity}";
-
-        UpdateManaText();
 
         if (gridManager != null)
             gridManager.GridMana();
     }
-    
+
+    public void StartTurn()
+    {
+        // Update Mana
+        if (gridManager != null)
+            gridManager.GridMana();
+        UpdateManaText();
+    }
+
     public void UpdateManaText()
     {
         if (currentPlayer != null && currentPlayer.manaValues != null && manaCountText != null)

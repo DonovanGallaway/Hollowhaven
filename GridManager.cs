@@ -260,25 +260,31 @@ void CenterCamera()
             {
                 // Need to add different switch for Qualia active
                 // Probably need to give "types" of Qualia so that we know which functions to check
-                UpdateMana(gameBoard[x, z]);
-                UpdateSquareVisual(x, z);
+                bool checkUpdate = UpdateMana(gameBoard[x, z]);
+                if (checkUpdate)
+                    UpdateSquareVisual(x, z);
+                
             }
         }
     }
 
-    public void UpdateMana(GridSquare square)
+    public bool UpdateMana(GridSquare square)
     {
+        // returning bool to allow us to skip update step on anything that doesn't need it
         if (turnManager.currentPlayer.identity == square.playerOwnership)
         {
             if (square.manaState == ManaState.Ashed)
-                {
-                    square.manaState = ManaState.Kindling;
-                }
-                else if (square.manaState == ManaState.Kindling)
-                {
-                    square.manaState = ManaState.Ignited;
-                }
+            {
+                square.manaState = ManaState.Kindling;
+                return true;
+            }
+            else if (square.manaState == ManaState.Kindling)
+            {
+                square.manaState = ManaState.Ignited;
+                return true;
+            }
         }
+        return false;
 
     }
 
