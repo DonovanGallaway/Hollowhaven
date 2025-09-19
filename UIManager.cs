@@ -11,12 +11,14 @@ public class UIManager : MonoBehaviour
     public GridManager gridManager;
     public TurnManager turnManager;
     public Button endTurnButton;
+    public Button cancelButton;
     public TMP_Dropdown actionList;
     public TMP_Dropdown secondaryList;
     // Start is called before the first frame update
     void Start()
     {
         endTurnButton.onClick.AddListener(turnManager.EndTurn);
+        cancelButton.onClick.AddListener(turnManager.Cancel);
         actionList.ClearOptions();
         secondaryList.gameObject.SetActive(false);
         List<TMP_Dropdown.OptionData> dropdownOptions = new List<TMP_Dropdown.OptionData>();

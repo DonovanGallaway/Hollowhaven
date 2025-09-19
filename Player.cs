@@ -19,8 +19,8 @@ public class ManaValues
             {
                 0 => fire,
                 1 => water, 
-                2 => air,
-                3 => earth,
+                2 => earth,
+                3 => air,
                 _ => 0
             };
         }
@@ -30,8 +30,8 @@ public class ManaValues
             {
                 case 0: fire = value; break;
                 case 1: water = value; break;
-                case 2: air = value; break;
-                case 3: earth = value; break;
+                case 2: earth = value; break;
+                case 3: air = value; break;
             }
         }
     }

@@ -25,7 +25,14 @@ public class TurnManager : MonoBehaviour
     public enum PlayerAction { Capture, Transmute, Attack, Ward, Extinguish, BigCapture, EditQualia, CastSpell, Select, AdminDebug };
     public TurnState currentState = TurnState.SelectAction;
     public PlayerAction? selectedAction = PlayerAction.Capture;
-    public void EndTurn() // Ends turn
+
+    public void Cancel()
+    {
+        transmuteSelected = false;
+        selectedAction = null;
+        currentState = TurnState.SelectAction;
+    }
+    public void EndTurn()
     {
         currentState = TurnState.End;
         // Mana cleanup
